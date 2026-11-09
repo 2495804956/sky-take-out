@@ -5,4 +5,11 @@ sky:
     port: 3306
     database: sky_take_out
     username: root
-    password: Mysql@2407020416
+    password: ${SKY_DB_PASSWORD}
+  alioss:
+    # 注意：不要带 https:// 前缀，SDK 默认走 HTTPS
+    endpoint: oss-cn-beijing.aliyuncs.com
+    # 建议用 RAM 子账号（仅授目标 Bucket 的 oss:PutObject），并通过环境变量注入，避免明文入库
+    accessKeyId: ${OSS_ACCESS_KEY_ID}
+    accessKeySecret: ${OSS_ACCESS_KEY_SECRET}
+    bucketName: sky-take-out-12345678666
