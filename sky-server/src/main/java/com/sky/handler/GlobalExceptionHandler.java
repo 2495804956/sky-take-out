@@ -29,6 +29,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler
     public Result exceptionHandler(SQLIntegrityConstraintViolationException ex){
+        log.error("数据库约束类异常：{}", ex.getMessage(), ex);   // 关键：把真实 SQL 错误打出来
         // Duplicate entry 'zhnagsan' for key 'employee.idx_username'
         String message = ex.getMessage();
         if(message.contains("Duplicate entry")){
@@ -37,8 +38,12 @@ public class GlobalExceptionHandler {
             return Result.error(msg);
         }else{
             return Result.error(MessageConstant.UNKNOWN_ERROR);
-
         }
     }
 
+    @ExceptionHandler
+   public Result exceptionHandler(Exception ex){
+        log.error("未知异常：", ex);
+        return Result.error(MessageConstant.UNKNOWN_ERROR);
+   }
 }
