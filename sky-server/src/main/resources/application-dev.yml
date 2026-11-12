@@ -13,3 +13,8 @@ sky:
     accessKeyId: ${OSS_ACCESS_KEY_ID}
     accessKeySecret: ${OSS_ACCESS_KEY_SECRET}
     bucketName: sky-take-out-12345678666
+
+  redis:
+    host: localhost
+    port: 6379
+    database: 1
