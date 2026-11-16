@@ -18,3 +18,8 @@ sky:
     host: localhost
     port: 6379
     database: 1
+
+  wechat:
+    # 键名必须与 WeChatProperties 字段一致：appid / secret（全小写，避免依赖宽松绑定的边界行为）
+    appid: wxc2c335c75624a36d
+    secret: ${WECHAT_APP_SECRET}

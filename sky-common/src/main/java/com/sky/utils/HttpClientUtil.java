@@ -16,6 +16,7 @@ import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,46 +32,45 @@ public class HttpClientUtil {
      * 发送GET方式请求
      * @param url
      * @param paramMap
-     * @return
+     * @return 响应体（HTTP 200）
+     * @throws IOException 网络/TLS/非200等失败时抛出，不再吞掉异常
      */
-    public static String doGet(String url,Map<String,String> paramMap){
-        // 创建Httpclient对象
-        CloseableHttpClient httpClient = HttpClients.createDefault();
+    public static String doGet(String url, Map<String, String> paramMap) throws IOException {
+        // 创建Httpclient对象，并设置连接/读取超时，避免请求无限挂起
+        RequestConfig requestConfig = RequestConfig.custom()
+                .setConnectTimeout(TIMEOUT_MSEC)
+                .setConnectionRequestTimeout(TIMEOUT_MSEC)
+                .setSocketTimeout(TIMEOUT_MSEC)
+                .build();
 
-        String result = "";
-        CloseableHttpResponse response = null;
+        // 用 try-with-resources 保证 response / httpClient 一定被关闭
+        try (CloseableHttpClient httpClient = HttpClients.custom()
+                .setDefaultRequestConfig(requestConfig)
+                .build()) {
 
-        try{
             URIBuilder builder = new URIBuilder(url);
-            if(paramMap != null){
-                for (String key : paramMap.keySet()) {
-                    builder.addParameter(key,paramMap.get(key));
+            if (paramMap != null) {
+                for (Map.Entry<String, String> entry : paramMap.entrySet()) {
+                    // 参数值为 null 会被拼成 "null"，这里提前拦截，避免发出无意义请求
+                    String value = entry.getValue();
+                    builder.addParameter(entry.getKey(), value == null ? "" : value);
                 }
             }
-            URI uri = builder.build();
 
-            //创建GET请求
-            HttpGet httpGet = new HttpGet(uri);
-
-            //发送请求
-            response = httpClient.execute(httpGet);
-
-            //判断响应状态
-            if(response.getStatusLine().getStatusCode() == 200){
-                result = EntityUtils.toString(response.getEntity(),"UTF-8");
+            HttpGet httpGet = new HttpGet(builder.build());
+            try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
+                int statusCode = response.getStatusLine().getStatusCode();
+                String result = response.getEntity() == null ? ""
+                        : EntityUtils.toString(response.getEntity(), "UTF-8");
+                if (statusCode != 200) {
+                    throw new IOException("HTTP请求失败, status=" + statusCode
+                            + ", url=" + httpGet.getURI() + ", body=" + result);
+                }
+                return result;
             }
-        }catch (Exception e){
-            e.printStackTrace();
-        }finally {
-            try {
-                response.close();
-                httpClient.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        } catch (URISyntaxException e) {
+            throw new IOException("请求URL不合法: " + url, e);
         }
-
-        return result;
     }
 
     /**

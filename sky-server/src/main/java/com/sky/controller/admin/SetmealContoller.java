@@ -4,7 +4,7 @@ import com.sky.dto.SetmealDTO;
 import com.sky.dto.SetmealPageQueryDTO;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
-import com.sky.service.SetmealDishService;
+import com.sky.service.SetmealService;
 import com.sky.vo.SetmealVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -23,7 +23,7 @@ import java.util.List;
 @Api(tags = "套餐管理")
 public class SetmealContoller {
     @Autowired
-    private SetmealDishService setmealDishService;
+    private SetmealService setmealService;
 
     /**
      * 新增套餐
@@ -32,7 +32,7 @@ public class SetmealContoller {
     @ApiOperation("新增套餐")
     public Result<String> save(@RequestBody SetmealDTO setmealDTO){
         log.info("新增套餐");
-        setmealDishService.saveWithDish(setmealDTO);
+        setmealService.saveWithDish(setmealDTO);
         return Result.success();
     }
 
@@ -43,7 +43,7 @@ public class SetmealContoller {
     @ApiOperation("套餐分页查询")
     public Result<PageResult> page(SetmealPageQueryDTO setmealPageQueryDTO){
         log.info("套餐分页查询");
-        PageResult pageResult = setmealDishService.pageQuery(setmealPageQueryDTO);
+        PageResult pageResult = setmealService.pageQuery(setmealPageQueryDTO);
         return Result.success(pageResult);
     }
 
@@ -54,7 +54,7 @@ public class SetmealContoller {
     @ApiOperation("批量删除套餐")
     public Result<String> delete(@RequestParam List<Long> ids){
         log.info("批量删除套餐");
-        setmealDishService.deleteBatch(ids);
+        setmealService.deleteBatch(ids);
         return Result.success();
     }
     /**
@@ -64,7 +64,7 @@ public class SetmealContoller {
     @ApiOperation("根据id查询套餐")
     public Result<SetmealVO> getById(@PathVariable Long id){
         log.info("根据id查询套餐");
-        SetmealVO setmealVO = setmealDishService.getByIdWithDishes(id);
+        SetmealVO setmealVO = setmealService.getByIdWithDishes(id);
         return Result.success(setmealVO);
     }
 
@@ -75,7 +75,7 @@ public class SetmealContoller {
     @ApiOperation("修改套餐")
     public Result<String> update(@RequestBody SetmealDTO setmealDTO){
         log.info("修改套餐");
-        setmealDishService.updateWithDish(setmealDTO);
+        setmealService.updateWithDish(setmealDTO);
         return Result.success();
     }
 
@@ -86,7 +86,7 @@ public class SetmealContoller {
     @ApiOperation("套餐起售停售")
     public Result<String> status(@PathVariable Integer status, Long id){
         log.info("套餐起售停售");
-        setmealDishService.startOrStop(status, id);
+        setmealService.startOrStop(status, id);
         return Result.success();
     }
 }
