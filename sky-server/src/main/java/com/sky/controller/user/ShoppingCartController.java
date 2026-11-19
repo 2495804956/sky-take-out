@@ -16,7 +16,7 @@ import java.util.List;
 @RequestMapping("/user/shoppingCart")
 @Slf4j
 @Api(tags = "购物车相关接口")
-public class shoppingCartController {
+public class ShoppingCartController {
 
     @Autowired
     private ShoppingCartService shoppingCartService;
@@ -50,6 +50,17 @@ public class shoppingCartController {
     public Result clean() {
         log.info("清空购物车");
         shoppingCartService.clean();
+        return Result.success();
+    }
+
+    /**
+     * 删除购物车中一个商品
+     */
+    @PostMapping("/sub")
+    @ApiOperation("删除购物车中一个商品")
+    public Result delete(@RequestBody ShoppingCartDTO shoppingCartDTO) {
+        log.info("删除购物车中一个商品：{}", shoppingCartDTO);
+        shoppingCartService.delete(shoppingCartDTO);
         return Result.success();
     }
 
